@@ -4,13 +4,16 @@ exports.getBarang = async (req, res) => {
   try {
     const [results] = await db.query(`
       SELECT 
-        b.id, 
-        b.nama_barang, 
+        b.id,
+        b.nama_barang,
         b.satuan,
-        CAST(IFNULL(SUM(bg.stok), 0) AS UNSIGNED) AS total_stok
+        CAST(IFNULL(s.total_stok, 0) AS UNSIGNED) AS total_stok
       FROM barang b
-      LEFT JOIN batch_barang bg ON b.id = bg.barang_id
-      GROUP BY b.id, b.nama_barang, b.satuan
+      LEFT JOIN (
+        SELECT barang_id, SUM(stok) AS total_stok
+        FROM batch_barang
+        GROUP BY barang_id
+      ) s ON b.id = s.barang_id
       ORDER BY b.nama_barang ASC
     `);
 
@@ -25,6 +28,7 @@ exports.getBarang = async (req, res) => {
     res.status(500).json({ error: err.message });
   }
 };
+
 
 exports.getBatchBarang = async (req, res) => {
   try {
