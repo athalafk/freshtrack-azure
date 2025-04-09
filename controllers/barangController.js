@@ -10,7 +10,7 @@ exports.getBarang = async (req, res) => {
         CAST(IFNULL(SUM(bg.stok), 0) AS UNSIGNED) AS total_stok
       FROM barang b
       LEFT JOIN batch_barang bg ON b.id = bg.barang_id
-      GROUP BY b.id
+      GROUP BY b.id, b.nama_barang, b.satuan
       ORDER BY b.nama_barang ASC
     `);
 
